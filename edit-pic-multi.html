@@ -1,0 +1,136 @@
+<html>
+<head>
+	<title>上传多张图片并进行预览</title>
+	<meta charset="utf-8" />
+	<style>
+		#selectedFiles img {
+			max-width: 125px;
+			max-height: 125px;
+			margin-bottom:10px;
+		}
+		.msyq-hideInput {
+			width: 85px;
+			height: 142px;
+ 			font-size:22px;
+ 			cursor:pointer;
+ 			opacity:0;
+		}
+
+		.msyq-picofhid {
+			width: 85px;
+			height: 142px;
+			background-color: #6dc8dc;
+			float: left;
+		}
+		.msyq-image-base {
+			width: 85px;
+			height: auto;
+			float: left;
+			margin-left: 5px;
+			text-align: center;
+		}
+		.msyq-image-base:hover {
+			width: 85px;
+			cursor:pointer;
+			height: auto;
+			float: left;
+			background-color: black;
+		}
+		.msyq-submit-base {
+			clear: both;
+			float: left;
+			margin-top: 10px;
+			border: 1px solid #1D80CF;
+  			width: 85px;
+  			text-align: center;
+  			font-size: 15px;
+  			color: #fff;
+  			text-shadow: 0 1px 1px rgba(0,0,0,.2);
+  			background: #80C3F7;
+  			background: -webkit-gradient(linear,left top,left bottom,from(#80c3f7),to(#6bbaf8));
+  			box-shadow: inset 0 1px 0 rgba(255,255,255,.3),0 1px 1px rgba(50,50,50,.05);
+  			border-radius: 5px;
+  			cursor: pointer;
+  			line-height: 33px;
+  			display: block;
+  			padding: 0 15px;
+  			outline: 0;
+		}
+	</style>
+</head>
+    
+<body>
+	
+	<form id="myForm" method="post" enctype="multipart/form-data">
+		<div id="selectedFiles"></div>
+		<div class="msyq-picofhid">
+			<i class="fa-plus"></i>
+        	<input class="msyq-hideInput" type="file" id="files" name="files" multiple="" accept="image/*">
+        </div>
+        <input class="msyq-submit-base" type="submit">
+	</form>
+
+	<script>
+	var selDiv = "";
+	var bufferFileArr = [];
+		
+	document.addEventListener("DOMContentLoaded", init, false);
+	
+	function init() {
+		document.querySelector('#files').addEventListener('change', handleFileSelect, false);
+		selDiv = document.querySelector("#selectedFiles");
+	}
+
+	function deleteTheTarget(e) {
+		imgQueue = document.querySelectorAll('img.msyq-image-base');
+		imgLength = imgQueue.length;
+		for(var i = 0; i < imgLength; i++) {
+			if(imgQueue[i].currentSrc === e.target.currentSrc) {
+				bufferFileArr.splice(i);
+			}
+		}
+	}
+
+	function handleRemovePic(e) {
+		deleteTheTarget(e);
+		selectNode = e.target;
+		selectNode.remove();
+	}
+		
+	function handleFileSelect(e) {
+		
+		if(!e.target.files || !window.FileReader) return;
+		
+		selDiv.innerHTML = "";
+		
+		var files = e.target.files;
+		var filesArr = Array.prototype.slice.call(files);
+
+		filesArr.forEach(function(item) {
+			bufferFileArr.push(item);
+		})
+
+		bufferFileArr.forEach(function(f) {
+			if(!f.type.match("image.*")) {
+				return;
+			}
+	
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				var html = "<img class=\"msyq-image-base\" src=\"" + e.target.result + "\">";
+				selDiv.innerHTML += html;
+				//document.querySelector('img.msyq-image-base').addEventListener('click', handleRemovePic, false);
+				imgQueue = document.querySelectorAll('img.msyq-image-base');
+				imgLength = imgQueue.length;
+				for(var i = 0; i < imgLength; i++) {
+					imgQueue[i].addEventListener('click', handleRemovePic, false);
+				}
+			}
+			reader.readAsDataURL(f); 
+			
+		});
+
+	}
+	</script>
+</body>
+</html>
